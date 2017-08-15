@@ -1,9 +1,28 @@
 #!/usr/bin/python
 
-import sys, getopt, time
+import sys, getopt, time, io
 import numpy as np
 from collections import deque
 from array import *
+
+# Punto para bash :D
+class colors:
+    NC='\033[0m'
+    Black='\033[0;30m'
+    DarkGray='\033[1;30m'
+    Red='\033[0;31m'
+    LightRed='\033[1;31m'
+    Green='\033[0;32m'
+    LightGreen='\033[1;32m'
+    BrownOrange='\033[0;33m'
+    Yellow='\033[1;33m'
+    Blue='\033[0;34m'
+    LightBlue='\033[1;34m'
+    Purple='\033[0;35m'
+    LightPurple='\033[1;35m'
+    Cyan='\033[0;36m'
+    LightCyan='\033[1;36m'
+    LightGray='\033[0;37m'
 
 """#import datetime
 # Public Reloj As Variant
@@ -196,12 +215,20 @@ class Simulator(object):
 
         print("Demora promedio por cliente:", var3)
 
-
-
-
 #---------------------------------------------
 # Funciones
 #---------------------------------------------
+def load(sim):
+    try:
+        sim.TMDeServicio = float(input("Ingrese el tiempo medio de servicio: "))
+        sim.TMEntreArribos = float(input("Ingrese el tiempo medio entre arribos: "))
+        #if debug == True:
+        print str(sim.TMDeServicio) +" "+ str(sim.TMEntreArribos)
+
+    except:
+        print colors.Red + "Ingresaste algo no valido...\n" + colors.Yellow + "en caso de ingresar texto use \"text\"" + colors.NC
+        sys.exit(2)
+
 def valorExponencial(media):
     return np.random.exponential(media)
 
@@ -215,16 +242,12 @@ def valorExponencial(media):
 #---------------------------------------------
 # Ejecucion del modelo
 #---------------------------------------------
-
-#sim1 = Simulator()
-#sim1.run()
-
-
 def main(argv):
-    inputfile = ''
+    debug = False
     outputfile = ''
+    corridas = 1
     try:
-        opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+        opts, args = getopt.getopt(argv,"ho:c:",["csvfile=","corridas=","debug"])
     except getopt.GetoptError:
         print 'Argumentos no valido pruebe con\n ColaSimple.py -h'
         sys.exit(2)
@@ -234,15 +257,19 @@ def main(argv):
             print 'Number of arguments:', len(sys.argv), 'arguments.'
             print 'Argument List:', str(sys.argv)
             print '~~~~~~~~~~~~~Trabajo Paractico 1 v0.0~~~~~~~~~~~~~\n'
-            print 'test.py -i <inputfile> -o <outputfile>'
             sys.exit()
-        elif opt in ("-i", "--ifile"):
-            inputfile = arg
-        elif opt in ("-o", "--ofile"):
+        elif opt in ("--debug"):
+            debug = True
+        elif opt in ("-c", "--corridas"):
+            corridas = arg
+        elif opt in ("-o", "--cvsfile"):
             outputfile = arg
-    print 'Input file is: ', inputfile
-    print 'Output file is: ', outputfile
+            #print 'guardo en: ', outputfile
 
 if __name__ == "__main__":
+    print colors.Cyan + '~~~~~~~~~~~~~Trabajo Paractico 1 v0.0~~~~~~~~~~~~~\n' + colors.NC
     main(sys.argv[1:])
+    sim1 = Simulator()
+    load(sim1)
+    #sim1.run()
 
