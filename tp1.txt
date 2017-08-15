@@ -1,3 +1,5 @@
+pip3 install numpy
+
     TP1 - Modificaciones al MM1
        por consola enviar parámetros de las variables que definen el comportamiento del sistema y muestre por salida estándar los valores de las 3 variables de respuesta
        que calcule la cantidad máxima de clientes en cola como una nueva variable de respuesta y que se muestre por salida estándar

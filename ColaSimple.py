@@ -1,5 +1,7 @@
+#!/usr/bin/python
+
+import sys, getopt, time
 import numpy as np
-import time
 from collections import deque
 from array import *
 
@@ -18,6 +20,11 @@ from array import *
 # Public Paso As Variant
 """
 
+print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+print 'Solo a modo ilustrativo'
+print 'Number of arguments:', len(sys.argv), 'arguments.'
+print 'Argument List:', str(sys.argv)
+print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 
 class Simulator(object):
 
@@ -48,7 +55,7 @@ class Simulator(object):
         #self.ListaDeEventos = [0,0]  qutar
 
         #
-        # ' VacÃ­o el vector que guardarÃ¡ los tiempos de arribo de los clientes a la cola
+        # ' Vacio el vector que guardar los tiempos de arribo de los clientes a la cola
         #for i in range(100):
         #    self.Cola[i] = 0
 
@@ -67,12 +74,12 @@ class Simulator(object):
         self.Paso = 0
         self.Iniciado = False
     #
-    # 'Llamo a la rutina de impresiÃ³n (al solo efecto de ver como evolucionan los valores de las variables)
+    # 'Llamo a la rutina de impresion (al solo efecto de ver como evolucionan los valores de las variables)
     # Call imprimo
 
     # Sub Principal()
     def run(self):
-        # 'Llamo a la rutina de inicializaciÃ³n
+        # 'Llamo a la rutina de inicializacion
         self.inicializar()
 
         # Loop Until Reloj >= 8 And NroDeClientesEnCola = 0 And EstadoServidor = "D"
@@ -80,14 +87,14 @@ class Simulator(object):
             # ' llamada a la rutina de tiempos
             self.tiempos()
 
-            # ' llamada a la rutina correspondiente en funciÃ³n del tipo de evento
+            # ' llamada a la rutina correspondiente en funcion del tipo de evento
             # Select Case ProximoEvento
             if self.ProximoEvento == "ARRIBOS":
                 self.arribos()
             else:
                 self.partidas()
 
-            # ' Llamada a la rutina de imprimo (sÃ³lo a los fines de ver el estado de las diferentes variables)
+            # ' Llamada a la rutina de imprimo (salo a los fines de ver el estado de las diferentes variables)
             # Call imprimo
             if self.Reloj >= 8 and self.NroDeClientesEnCola == 0 and self.EstadoServidor == "D":
                 break
@@ -100,13 +107,13 @@ class Simulator(object):
         #self.ListaDeEventos[1] = self.Reloj + generarTiempoEntreArribos(0.5)
         self.ListaDeEventos[0] = self.Reloj + valorExponencial(self.TMEntreArribos)
         #
-        # 'Pregunto si el servidor estÃ¡ desocupado
+        # 'Pregunto si el servidor esta desocupado
         # If EstadoServidor = "D" Then
         if self.EstadoServidor == "D":
             # ' Cambio el estado del servidor a "Ocupado"
             self.EstadoServidor = "O"
 
-            # ' Programo el prÃ³ximo evento partida
+            # ' Programo el proximo evento partida
             self.ListaDeEventos[1] = self.Reloj + valorExponencial(self.TMDeServicio)
 
             # ' Acumulo el tiempo de servicio
@@ -117,15 +124,15 @@ class Simulator(object):
             self.CompletaronDemora += 1
 
         else:
-            # 'Calculo el Área bajo Q(t) desde el momento actual del reloj hacia atrÃ¡s (TiempoUltimoEvento)
+            # 'Calculo el area bajo Q(t) desde el momento actual del reloj hacia atras (TiempoUltimoEvento)
             # AreaQDeT = AreaQDeT + (NroDeClientesEnCola * (Reloj - TiempoUltimoEvento))
             self.AreaQDeT += (self.NroDeClientesEnCola * (self.Reloj - self.TiempoUltimoEvento))
 
             # ' Incremento la cantidad de clientes en cola en uno (1)
             self.NroDeClientesEnCola += 1
 
-            # 'Guardo el valor del reloj en la posiciÃ³n "NroDeClientesEnCola" para saber cuando llegÃ³
-            # 'el cliente a la cola y mÃ¡s adelante calcular la demora.
+            # 'Guardo el valor del reloj en la posicionn "NroDeClientesEnCola" para saber cuando llegar
+            # 'el cliente a la cola y mas adelante calcular la demora.
             # Cola(NroDeClientesEnCola) = Reloj
             #self.Cola[self.NroDeClientesEnCola] = self.Reloj
             self.Cola.append(self.Reloj)
@@ -133,11 +140,11 @@ class Simulator(object):
     def partidas(self):
         # ' Pregunto si hay clientes en cola
         if self.NroDeClientesEnCola > 0:
-            # ' Tiempo del prÃ³ximo evento partida
+            # ' Tiempo del proximo evento partida
             self.ListaDeEventos[1] = self.Reloj + valorExponencial(self.TMDeServicio)
 
             # 'Acumulo la demora acumulada como el valor actual del reloj
-            # 'menos el valor del reloj cuando el cliente ingresÃ³ a la cola
+            # 'menos el valor del reloj cuando el cliente ingresa a la cola
             self.DemoraAcumulada += self.Reloj - self.Cola[0]
 
             # ' Actualizo el contador de clientes que completaron la demora
@@ -146,14 +153,14 @@ class Simulator(object):
             # ' Acumulo el tiempo de servicio
             self.TSAcumulado += (self.ListaDeEventos[1] - self.Reloj)
             #
-            # Calculo el Área bajo Q(t) del perÃ­odo anterior (Reloj - TiempoUltimoEvento)
+            # Calculo el Area bajo Q(t) del perriodo anterior (Reloj - TiempoUltimoEvento)
             self.AreaQDeT += (self.NroDeClientesEnCola * (self.Reloj - self.TiempoUltimoEvento))
             #
             # ' Decremento la cantidad de clientes en cola en uno (1)
             self.NroDeClientesEnCola -= 1
 
             # ' Llamo a la rutina encargada de gestionar la cola
-            # ' En este caso deberÃ¡ desplazar todos los valores una posiciÃ³n hacia adelante
+            # ' En este caso debera desplazar todos los valores una posicion hacia adelante
             #self.quitarDeLaCola()
             self.Cola.pop(0)
         else:
@@ -186,8 +193,7 @@ class Simulator(object):
             var2 = self.TSAcumulado / self.Reloj
         except ZeroDivisionError:
             var2 = 0
-        print("Utilización promedio de los servidores:", var2)
-
+        print("Utilizacion promedio de los servidores:", var2)
 
         try:
             var3 = self.DemoraAcumulada / self.CompletaronDemora
@@ -213,8 +219,9 @@ def valorExponencial(media):
 """
 
 #---------------------------------------------
-# Ejecución del modelo
+# Ejecucion del modelo
 #---------------------------------------------
 
-sim1 = Simulator()
-sim1.run()
+#sim1 = Simulator()
+#sim1.run()
+
