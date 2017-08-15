@@ -20,8 +20,7 @@ from array import *
 # Public Paso As Variant
 """
 
-print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-print 'Solo a modo ilustrativo'
+print '~~~~~~~~~~~Solo a modo ilustrativo~~~~~~~~~~~~~~~'
 print 'Number of arguments:', len(sys.argv), 'arguments.'
 print 'Argument List:', str(sys.argv)
 print 'Argument:', sys.argv[0]
