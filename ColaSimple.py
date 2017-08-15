@@ -23,7 +23,9 @@ from array import *
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 print 'Solo a modo ilustrativo'
 print 'Number of arguments:', len(sys.argv), 'arguments.'
-print 'Argument List:', str(sys.argv)[1]
+print 'Argument List:', str(sys.argv)
+print 'Argument:', sys.argv[0]
+print 'Argument:', sys.argv[1]
 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 
 class Simulator(object):
