@@ -226,22 +226,22 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
     except getopt.GetoptError:
-        print 'test.py -i <inputfile> -o <outputfile>'
+        print 'Argumentos no valido pruebe con\n ColaSimple.py -h'
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-           print '~~~~~~~~~~~~~~~~~~~~Argumentos~~~~~~~~~~~~~~~~~~~~'
-           print 'Number of arguments:', len(sys.argv), 'arguments.'
-           print 'Argument List:', str(sys.argv)
-           print '~~~~~~~~~~~~~Trabajo Paractico 1 v0.0~~~~~~~~~~~~~\n'
-           print 'test.py -i <inputfile> -o <outputfile>'
-           sys.exit()
+            print '~~~~~~~~~~~~~~~~~~~~Argumentos~~~~~~~~~~~~~~~~~~~~'
+            print 'Number of arguments:', len(sys.argv), 'arguments.'
+            print 'Argument List:', str(sys.argv)
+            print '~~~~~~~~~~~~~Trabajo Paractico 1 v0.0~~~~~~~~~~~~~\n'
+            print 'test.py -i <inputfile> -o <outputfile>'
+            sys.exit()
         elif opt in ("-i", "--ifile"):
-           inputfile = arg
+            inputfile = arg
         elif opt in ("-o", "--ofile"):
-           outputfile = arg
-    print 'Input file is "', inputfile
-    print 'Output file is "', outputfile
+            outputfile = arg
+    print 'Input file is: ', inputfile
+    print 'Output file is: ', outputfile
 
 if __name__ == "__main__":
     main(sys.argv[1:])
