@@ -79,7 +79,7 @@ class Simulator(object):
             print colors.LightCyan+"Relo\t"+colors.NC+str(self.Reloj)+colors.NC
             print colors.LightCyan+"EstadoServidor\t"+colors.Yellow+str(self.EstadoServidor)+colors.NC
             print colors.LightCyan+"ProximoEvento\t"+colors.Yellow+str(self.ProximoEvento)+colors.NC
-            if len(self.Cola) <= 15:
+            if len(self.ListaDeEventos) <= 15:
                 print colors.LightCyan+"ListaDeEventos\t"+colors.Purple+str(np.array(self.ListaDeEventos))+colors.NC
             else:
                 print colors.LightCyan+"ListaDeEventos de logitud\t"+colors.Red+str(len(self.ListaDeEventos))+colors.NC
