@@ -74,7 +74,7 @@ class Simulator(object):
     # 'Llamo a la rutina de impresion (al solo efecto de ver como evolucionan los valores de las variables)
     # Call imprimo
     def toString(self):
-        if True:
+        if not Programa.Silencio:
             print "Valor de la simulacion: "
             print colors.LightCyan+"Relo\t"+colors.NC+str(self.Reloj)+colors.NC
             print colors.LightCyan+"EstadoServidor\t"+colors.Yellow+str(self.EstadoServidor)+colors.NC
@@ -281,8 +281,9 @@ class colors:
 # Progrma, el de consola
 #---------------------------------------------
 class Programa(object):
-    Observacion = 1
+    Observacion = 0
     Corridas = 1
+    Silencio = False
 
     def __init__(self):
         self.version = "1.3"
@@ -299,7 +300,7 @@ class Programa(object):
     def getArg(self,argv):
         print colors.Cyan + '~~~~~~~~~~~~~'+self.name+' v'+self.version+'~~~~~~~~~~~~~' + colors.NC
         try:
-            opts, args = getopt.getopt(argv,"ho:c:z")
+            opts, args = getopt.getopt(argv,"ho:c:zs")
         except getopt.GetoptError:
             print 'Argumentos no valido pruebe con\n'+sys.argv[0]+' -h'
             sys.exit(2)
@@ -313,6 +314,8 @@ class Programa(object):
                 print '-p -> bara de progreso en lular de reportes en dada simulacion [-p]'
                 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'
                 sys.exit()
+            elif opt == '-s':
+                Programa.Silencio = True
             elif opt == '-c':
                 Programa.Corridas = arg
             elif opt == '-o':
@@ -336,7 +339,7 @@ if __name__ == "__main__":
 
     program.load(sim1)
     print colors.Cyan+'~~~~~~~~~~~~~~~~Correr Simulacion~~~~~~~~~~~~~~~~~'+ colors.NC
-    for x in xrange(1, int(Programa.Corridas)):
+    for x in xrange(0, int(Programa.Corridas)):
         Programa.Observacion += 1
         sim1.run()
 #generar 100 observaciones de las variables de respuesta, generando un archivo csv como salida
