@@ -86,9 +86,29 @@ class Simulator(object):
         self.ListaDeEventos.append(99999.0)
         self.Paso = 0
         self.Iniciado = False
+        self.toString()
+
     #
     # 'Llamo a la rutina de impresion (al solo efecto de ver como evolucionan los valores de las variables)
     # Call imprimo
+    def toString(self):
+        print "Valor de la simulacion: "
+        print colors.LightCyan+"Relo\t"+colors.NC + str(self.Reloj)
+        print colors.LightCyan+"EstadoServidor\t"+colors.NC + str(self.EstadoServidor)
+        print colors.LightCyan+"ProximoEvento\t"+colors.NC+ str(self.ProximoEvento)
+        print colors.LightCyan+"ListaDeEventos\t"+colors.NC+ str(self.ListaDeEventos)
+        print colors.LightCyan+"Cola\t"+colors.NC+ str(self.Cola)
+        print colors.LightCyan+"TSAcumulado\t"+colors.NC+ str(self.TSAcumulado)
+        print colors.LightCyan+"DemoraAcumulada\t"+colors.NC+ str(self.DemoraAcumulada)
+        print colors.LightCyan+"NroDeClientesEnCola\t"+colors.NC+ str(self.NroDeClientesEnCola)
+        print colors.LightCyan+"AreaQDeT\t"+colors.NC+ str(self.AreaQDeT)
+        print colors.LightCyan+"TiempoUltimoEvento\t"+colors.NC+ str(self.TiempoUltimoEvento)
+        print colors.LightCyan+"CompletaronDemora\t"+colors.NC+ str(self.CompletaronDemora)
+        print colors.LightCyan+"Paso\t"+colors.NC+ str(self.Paso)
+        print colors.LightCyan+"TMEntreArribos\t"+colors.NC+ str(self.TMEntreArribos)
+        print colors.LightCyan+"TMDeServicio\t"+colors.NC+ str(self.TMDeServicio)
+        print colors.LightCyan+"Iniciado\t"+colors.NC+ str(self.Iniciado)
+        print "\n"
 
     # Sub Principal()
     def run(self):
@@ -194,41 +214,30 @@ class Simulator(object):
             #print(self.Reloj)
 
     def reportes(self):
+        print colors.LightGreen+'~~~~~~~~~~~~~~~~~~~~~~Reporte~~~~~~~~~~ '+colors.BrownOrange +"Corrida: "+str(0) + colors.NC
         try:
             var1 = self.AreaQDeT / self.Reloj
         except ZeroDivisionError:
             var1 = 0
-
-        print("Nro promedio de cli en cola:", var1)
-
-
+        print colors.Green+'Nro Promedio Clientes En Cola: '+colors.NC+ str(var1)
         try:
             var2 = self.TSAcumulado / self.Reloj
         except ZeroDivisionError:
             var2 = 0
-        print("Utilizacion promedio de los servidores:", var2)
-
+        print colors.Green+'Utilizacion Promedio Servidores: ' +colors.NC+ str(var2)
         try:
             var3 = self.DemoraAcumulada / self.CompletaronDemora
         except ZeroDivisionError:
             var3 = 0
+        print colors.Green+'Demora Promedio Por Cliente: '+colors.NC+ str(var3)
 
-        print("Demora promedio por cliente:", var3)
+        print colors.Green+'Cantidad Maxima de Clientes en Cola: '+colors.NC+ str(self.NroDeClientesEnCola)
+
+        print colors.LightGreen+'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'+colors.NC
 
 #---------------------------------------------
-# Funciones
+# Funciones Utiluidades
 #---------------------------------------------
-def load(sim):
-    try:
-        sim.TMDeServicio = float(input("Ingrese el tiempo medio de servicio: "))
-        sim.TMEntreArribos = float(input("Ingrese el tiempo medio entre arribos: "))
-        #if debug == True:
-        print str(sim.TMDeServicio) +" "+ str(sim.TMEntreArribos)
-
-    except:
-        print colors.Red + "Ingresaste algo no valido...\n" + colors.Yellow + "en caso de ingresar texto use \"text\"" + colors.NC
-        sys.exit(2)
-
 def valorExponencial(media):
     return np.random.exponential(media)
 
@@ -238,14 +247,26 @@ def valorExponencial(media):
         pcola[i] = pcola[i + 1]
     pcola[ncola] = ""
 """
+#---------------------------------------------
+# Progrma, el de consola
+#---------------------------------------------
 
-#---------------------------------------------
-# Ejecucion del modelo
-#---------------------------------------------
-def main(argv):
-    debug = False
-    outputfile = ''
-    corridas = 1
+# Globales
+name = "Trabajo Practico 1 v0.0"
+corridas = 1
+outputfile = ''
+
+def load(sim):
+    try:
+        sim.TMDeServicio = float(input("Ingrese el tiempo medio de servicio: "))
+        sim.TMEntreArribos = float(input("Ingrese el tiempo medio entre arribos: "))
+
+    except:
+        print colors.Red + "Ingresaste algo no valido...\n" + colors.Yellow + "en caso de ingresar texto use \"text\"" + colors.NC
+        sys.exit(2)
+
+def program(argv):
+    print colors.Cyan + '~~~~~~~~~~~~~'+name+'~~~~~~~~~~~~~\n' + colors.NC
     try:
         opts, args = getopt.getopt(argv,"ho:c:",["csvfile=","corridas=","debug"])
     except getopt.GetoptError:
@@ -256,20 +277,23 @@ def main(argv):
             print '~~~~~~~~~~~~~~~~~~~~Argumentos~~~~~~~~~~~~~~~~~~~~'
             print 'Number of arguments:', len(sys.argv), 'arguments.'
             print 'Argument List:', str(sys.argv)
-            print '~~~~~~~~~~~~~Trabajo Paractico 1 v0.0~~~~~~~~~~~~~\n'
+            print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'
             sys.exit()
-        elif opt in ("--debug"):
-            debug = True
         elif opt in ("-c", "--corridas"):
             corridas = arg
         elif opt in ("-o", "--cvsfile"):
             outputfile = arg
             #print 'guardo en: ', outputfile
 
+#---------------------------------------------
+# Ejecucion del modelo
+#---------------------------------------------
 if __name__ == "__main__":
-    print colors.Cyan + '~~~~~~~~~~~~~Trabajo Paractico 1 v0.0~~~~~~~~~~~~~\n' + colors.NC
-    main(sys.argv[1:])
+    program(sys.argv[1:])
     sim1 = Simulator()
-    load(sim1)
-    #sim1.run()
 
+    sim1.inicializar()
+    load(sim1)
+    print colors.Cyan+'~~~~~~~~~~~~~~~~Correr Simulacion~~~~~~~~~~~~~~~~~'
+
+    sim1.run()
