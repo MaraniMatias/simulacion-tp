@@ -241,7 +241,10 @@ class Reporte(object):
 # Funciones Utiluidades
 #---------------------------------------------
 def valorExponencial(media):
-    return np.random.exponential(media)
+    try:
+        return np.random.exponential(media)
+    except ValueError:
+        print colors.Red + str(ValueError) + colors.NC
 
 """def quitarDeLaCola(pcola):
     ncola = len(pcola)
@@ -311,8 +314,7 @@ if __name__ == "__main__":
     sim1 = Simulator()
     sim1.inicializar()
     load(sim1)
-    print colors.Cyan+'~~~~~~~~~~~~~~~~Correr Simulacion~~~~~~~~~~~~~~~~~'
+    print colors.Cyan+'~~~~~~~~~~~~~~~~Correr Simulacion~~~~~~~~~~~~~~~~~'+ colors.NC
 
     sim1.run()
-
 #generar 100 observaciones de las variables de respuesta, generando un archivo csv como salida
