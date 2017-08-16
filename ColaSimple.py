@@ -252,7 +252,7 @@ def valorExponencial(media):
 #---------------------------------------------
 
 # Globales
-name = "Trabajo Practico 1 v0.0"
+name = "Trabajo Practico 1 v1.1"
 corridas = 1
 outputfile = ''
 
