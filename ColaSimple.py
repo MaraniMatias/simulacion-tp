@@ -197,7 +197,7 @@ class Simulator(object):
 
     def reportes(self):
         reporte = Reporte()
-        reporte.Observacion = 0
+        reporte.Observacion = 1
         reporte.NroMaximoDeClientesEnCola = self.NroMaximoDeClientesEnCola
         try:
             reporte.NroPromedioClientesEnCola =  self.AreaQDeT / self.Reloj
@@ -234,10 +234,16 @@ class Reporte(object):
         print colors.LightGreen+'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'+colors.NC
 
     def toCsv(self):
-        with open('reporte.csv', 'w') as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=';', quotechar=';', quoting=csv.QUOTE_MINIMAL)
-            spamwriter.writerow(['Observaciones','Nro Promedio Clientes En Cola', 'Utilizacion Promedio Servidores', 'Demora Promedio Por Cliente','Cantidad Maxima de Clientes en Cola'])
-            spamwriter.writerow([self.Observacion,self.NroPromedioClientesEnCola,self.UtilizacionPromedioServidores,self.DemoraPromedioPorCliente,self.NroMaximoDeClientesEnCola])
+        newRow = "%s,%s,%s,%s,%s\n" % (self.Observacion,self.NroPromedioClientesEnCola,self.UtilizacionPromedioServidores,self.DemoraPromedioPorCliente,self.NroMaximoDeClientesEnCola)
+        if self.Observacion <=0:
+            # Escribo la cabecera
+            with open('reporte.csv', 'wb') as csvfile:
+                spamwriter = csv.writer(csvfile, delimiter=';', quotechar=';', quoting=csv.QUOTE_MINIMAL)
+                spamwriter.writerow(['Observaciones','Nro Promedio Clientes En Cola', 'Utilizacion Promedio Servidores', 'Demora Promedio Por Cliente','Cantidad Maxima de Clientes en Cola'])
+        # agrego una linea
+        with open('reporte.csv', 'a') as csvfile:
+            csvfile.write(newRow.encode('utf8'))
+
 
 #---------------------------------------------
 # Funciones Utiluidades
@@ -286,7 +292,7 @@ def load(sim):
 def program(argv):
     print colors.Cyan + '~~~~~~~~~~~~~'+name+'~~~~~~~~~~~~~' + colors.NC
     try:
-        opts, args = getopt.getopt(argv,"ho:c:",["csvfile=","corridas="])
+        opts, args = getopt.getopt(argv,"ho:c:",["csvfile=","corridas=","report="])
     except getopt.GetoptError:
         print 'Argumentos no valido pruebe con\n ColaSimple.py -h'
         sys.exit(2)
