@@ -197,7 +197,6 @@ class Simulator(object):
 
     def reportes(self):
         reporte = Reporte()
-        reporte.Observacion = 1
         reporte.NroMaximoDeClientesEnCola = self.NroMaximoDeClientesEnCola
         try:
             reporte.NroPromedioClientesEnCola =  self.AreaQDeT / self.Reloj
@@ -218,16 +217,15 @@ class Simulator(object):
 # Clase encarda de los reportes
 #---------------------------------------------
 class Reporte(object):
-    outputfile = ""
+
     def __init__(self):
-        self.Observacion = 0
         self.NroPromedioClientesEnCola = 0.0
         self.UtilizacionPromedioServidores = 0.0
         self.DemoraPromedioPorCliente = 0.0
         self.NroMaximoDeClientesEnCola = 0.0
 
     def show(self):
-        print colors.LightGreen+'~~~~~~~~~~~~~~~~~~~~~~Reporte~~~~~~~~~~ '+colors.BrownOrange +"Corrida: "+str(self.Observacion) + colors.NC
+        print colors.LightGreen+'~~~~~~~~~~~~~~~~~~~~~~Reporte~~~~~~~~~~ '+colors.BrownOrange +"Corrida: "+str(Programa.Observacion) +'/'+str(Programa.Corridas)+ colors.NC
         print colors.Green+'Nro Promedio Clientes En Cola: '+colors.NC+ str(self.NroPromedioClientesEnCola)
         print colors.Green+'Utilizacion Promedio Servidores: ' +colors.NC+ str(self.UtilizacionPromedioServidores)
         print colors.Green+'Demora Promedio Por Cliente: '+colors.NC+ str(self.DemoraPromedioPorCliente)
@@ -236,8 +234,8 @@ class Reporte(object):
 
     def toCsv(self):
         if Reporte.outputfile != "":
-            newRow = "%s,%s,%s,%s,%s\n" % (self.Observacion,self.NroPromedioClientesEnCola,self.UtilizacionPromedioServidores,self.DemoraPromedioPorCliente,self.NroMaximoDeClientesEnCola)
-            if self.Observacion <=0:
+            newRow = "%s,%s,%s,%s,%s\n" % (Programa.Observacion,self.NroPromedioClientesEnCola,self.UtilizacionPromedioServidores,self.DemoraPromedioPorCliente,self.NroMaximoDeClientesEnCola)
+            if Programa.Observacion <=1:
                 # Escribo la cabecera
                 with open(Reporte.outputfile+'.csv', 'wb') as csvfile:
                     spamwriter = csv.writer(csvfile, delimiter=';', quotechar=';', quoting=csv.QUOTE_MINIMAL)
@@ -283,11 +281,12 @@ class colors:
 # Progrma, el de consola
 #---------------------------------------------
 class Programa(object):
+    Observacion = 1
+    Corridas = 1
 
     def __init__(self):
         self.version = "1.3"
         self.name = "Trabajo Practico 1"
-        self.corridas = 0
 
     def load(self,sim):
         try:
@@ -315,13 +314,12 @@ class Programa(object):
                 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'
                 sys.exit()
             elif opt == '-c':
-                self.corridas = arg
-                print " opt: "+ str(opt) + "arg: "+str(arg)
+                Programa.Corridas = arg
             elif opt == '-o':
-                print " opt: "+ str(opt) + "arg: "+str(arg)
                 Reporte.outputfile = str(arg)
             elif opt == '-z':
                 print '~~~~~~~~~~~~~~~~~~~~Argumentos~~~~~~~~~~~~~~~~~~~~'
+                print " opt: "+ str(opt) + "arg: "+str(arg)
                 print 'Number of arguments:', len(sys.argv), 'arguments.'
                 print 'Argument List:', str(sys.argv)
                 print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'
@@ -338,6 +336,7 @@ if __name__ == "__main__":
 
     program.load(sim1)
     print colors.Cyan+'~~~~~~~~~~~~~~~~Correr Simulacion~~~~~~~~~~~~~~~~~'+ colors.NC
-
-    sim1.run()
+    for x in xrange(1, int(Programa.Corridas)):
+        Programa.Observacion += 1
+        sim1.run()
 #generar 100 observaciones de las variables de respuesta, generando un archivo csv como salida
