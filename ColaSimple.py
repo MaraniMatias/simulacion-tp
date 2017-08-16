@@ -198,6 +198,7 @@ class Simulator(object):
     def reportes(self):
         reporte = Reporte()
         reporte.Observacion = 0
+        reporte.NroMaximoDeClientesEnCola = self.NroMaximoDeClientesEnCola
         try:
             reporte.NroPromedioClientesEnCola =  self.AreaQDeT / self.Reloj
         except ZeroDivisionError:
@@ -211,6 +212,7 @@ class Simulator(object):
         except ZeroDivisionError:
             print ZeroDivisionError
         reporte.show()
+        reporte.toCsv()
 
 #---------------------------------------------
 # Clase encarda de los reportes
@@ -224,7 +226,7 @@ class Reporte(object):
         self.NroMaximoDeClientesEnCola = 0.0
 
     def show(self):
-        print colors.LightGreen+'~~~~~~~~~~~~~~~~~~~~~~Reporte~~~~~~~~~~ '+colors.BrownOrange +"Corrida: "+str(0) + colors.NC
+        print colors.LightGreen+'~~~~~~~~~~~~~~~~~~~~~~Reporte~~~~~~~~~~ '+colors.BrownOrange +"Corrida: "+str(self.Observacion) + colors.NC
         print colors.Green+'Nro Promedio Clientes En Cola: '+colors.NC+ str(self.NroPromedioClientesEnCola)
         print colors.Green+'Utilizacion Promedio Servidores: ' +colors.NC+ str(self.UtilizacionPromedioServidores)
         print colors.Green+'Demora Promedio Por Cliente: '+colors.NC+ str(self.DemoraPromedioPorCliente)
@@ -235,7 +237,7 @@ class Reporte(object):
         with open('reporte.csv', 'w') as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=';', quotechar=';', quoting=csv.QUOTE_MINIMAL)
             spamwriter.writerow(['Observaciones','Nro Promedio Clientes En Cola', 'Utilizacion Promedio Servidores', 'Demora Promedio Por Cliente','Cantidad Maxima de Clientes en Cola'])
-            spamwriter.writerow([0,])
+            spamwriter.writerow([self.Observacion,self.NroPromedioClientesEnCola,self.UtilizacionPromedioServidores,self.DemoraPromedioPorCliente,self.NroMaximoDeClientesEnCola])
 
 #---------------------------------------------
 # Funciones Utiluidades
