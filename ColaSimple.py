@@ -198,6 +198,8 @@ class Simulator(object):
     def reportes(self):
         reporte = Reporte()
         reporte.NroMaximoDeClientesEnCola = self.NroMaximoDeClientesEnCola
+        reporte.TMDeServicio = self.TMDeServicio
+        reporte.TMEntreArribos = self.TMEntreArribos
         try:
             reporte.NroPromedioClientesEnCola =  self.AreaQDeT / self.Reloj
         except ZeroDivisionError:
@@ -224,9 +226,18 @@ class Reporte(object):
         self.DemoraPromedioPorCliente = 0.0
         self.NroMaximoDeClientesEnCola = 0.0
 
+        # Valores de entrada:
+        self.TMDeServicio = 0.0
+        self.TMEntreArribos = 0.0
+
     def show(self):
         print colors.LightGreen+'~~~~~~~~~~~~~~~~~~~~~~Reporte~~~~~~~~~~ '+colors.BrownOrange +"Corrida: "+str(Programa.Observacion) +'/'+str(Programa.Corridas)+ colors.NC
-        print colors.Green+'Nro Promedio Clientes En Cola: '+colors.NC+ str(self.NroPromedioClientesEnCola)
+        print colors.Yellow+"Variables de entrada:"+colors.NC
+        print colors.LightCyan+"Tiempo medio de servicio: "+colors.NC+str(self.TMDeServicio)
+        print colors.LightCyan+"Tiempo medio entre arribos: "+colors.NC+str(self.TMEntreArribos)
+
+        print colors.Yellow+"Variables de respuesta:"+colors.NC
+        print colors.Green+'Nro Promedio Clientes En Cola: '+colors.NC+str(self.NroPromedioClientesEnCola)
         print colors.Green+'Utilizacion Promedio Servidores: ' +colors.NC+ str(self.UtilizacionPromedioServidores)
         print colors.Green+'Demora Promedio Por Cliente: '+colors.NC+ str(self.DemoraPromedioPorCliente)
         print colors.Green+'Cantidad Maxima de Clientes en Cola: '+colors.NC+ str(self.NroMaximoDeClientesEnCola)
@@ -288,14 +299,20 @@ class Programa(object):
     def __init__(self):
         self.version = "1.3"
         self.name = "Trabajo Practico 1"
+        self.TMDeServicio = 0.0
+        self.TMEntreArribos = 0.0
 
-    def load(self,sim):
+    def read(self):
         try:
-            sim.TMDeServicio = float(input("Ingrese el tiempo medio de servicio: "))
-            sim.TMEntreArribos = float(input("Ingrese el tiempo medio entre arribos: "))
+            self.TMDeServicio = float(input("Ingrese el tiempo medio de servicio: "))
+            self.TMEntreArribos = float(input("Ingrese el tiempo medio entre arribos: "))
         except:
             print colors.Red + "Ingresaste algo no valido...\n" + colors.Yellow + "en caso de ingresar texto use \"text\"" + colors.NC
             sys.exit(2)
+
+    def load(self,sim):
+        sim.TMDeServicio = self.TMDeServicio
+        sim.TMEntreArribos = self.TMEntreArribos
 
     def getArg(self,argv):
         print colors.Cyan + '~~~~~~~~~~~~~'+self.name+' v'+self.version+'~~~~~~~~~~~~~' + colors.NC
@@ -334,12 +351,12 @@ class Programa(object):
 if __name__ == "__main__":
     program = Programa()
     program.getArg(sys.argv[1:])
-    sim1 = Simulator()
-    sim1.inicializar()
-
-    program.load(sim1)
+    program.read()
+    sim = Simulator()
     print colors.Cyan+'~~~~~~~~~~~~~~~~Correr Simulacion~~~~~~~~~~~~~~~~~'+ colors.NC
     for x in xrange(0, int(Programa.Corridas)):
         Programa.Observacion += 1
-        sim1.run()
+        sim.inicializar()
+        program.load(sim)
+        sim.run()
 #generar 100 observaciones de las variables de respuesta, generando un archivo csv como salida
