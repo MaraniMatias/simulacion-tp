@@ -218,6 +218,7 @@ class Simulator(object):
 # Clase encarda de los reportes
 #---------------------------------------------
 class Reporte(object):
+    outputfile = ""
     def __init__(self):
         self.Observacion = 0
         self.NroPromedioClientesEnCola = 0.0
@@ -234,16 +235,17 @@ class Reporte(object):
         print colors.LightGreen+'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'+colors.NC
 
     def toCsv(self):
-        newRow = "%s,%s,%s,%s,%s\n" % (self.Observacion,self.NroPromedioClientesEnCola,self.UtilizacionPromedioServidores,self.DemoraPromedioPorCliente,self.NroMaximoDeClientesEnCola)
-        if self.Observacion <=0:
-            # Escribo la cabecera
-            with open('reporte.csv', 'wb') as csvfile:
-                spamwriter = csv.writer(csvfile, delimiter=';', quotechar=';', quoting=csv.QUOTE_MINIMAL)
-                spamwriter.writerow(['Observaciones','Nro Promedio Clientes En Cola', 'Utilizacion Promedio Servidores', 'Demora Promedio Por Cliente','Cantidad Maxima de Clientes en Cola'])
-        # agrego una linea
-        with open('reporte.csv', 'a') as csvfile:
-            csvfile.write(newRow.encode('utf8'))
-
+        if Reporte.outputfile != "":
+            newRow = "%s,%s,%s,%s,%s\n" % (self.Observacion,self.NroPromedioClientesEnCola,self.UtilizacionPromedioServidores,self.DemoraPromedioPorCliente,self.NroMaximoDeClientesEnCola)
+            if self.Observacion <=0:
+                # Escribo la cabecera
+                with open(Reporte.outputfile+'.csv', 'wb') as csvfile:
+                    spamwriter = csv.writer(csvfile, delimiter=';', quotechar=';', quoting=csv.QUOTE_MINIMAL)
+                    spamwriter.writerow(['Observaciones','Nro Promedio Clientes En Cola', 'Utilizacion Promedio Servidores', 'Demora Promedio Por Cliente','Cantidad Maxima de Clientes en Cola'])
+            # agrego una linea
+            with open(Reporte.outputfile+'.csv', 'a') as csvfile:
+                csvfile.write(newRow.encode('utf8'))
+            print colors.LightBlue+"Guardado en: %s.csv" % (Reporte.outputfile)+colors.NC
 
 #---------------------------------------------
 # Funciones Utiluidades
@@ -280,48 +282,61 @@ class colors:
 #---------------------------------------------
 # Progrma, el de consola
 #---------------------------------------------
-def load(sim):
-    try:
-        sim.TMDeServicio = float(input("Ingrese el tiempo medio de servicio: "))
-        sim.TMEntreArribos = float(input("Ingrese el tiempo medio entre arribos: "))
+class Programa(object):
 
-    except:
-        print colors.Red + "Ingresaste algo no valido...\n" + colors.Yellow + "en caso de ingresar texto use \"text\"" + colors.NC
-        sys.exit(2)
+    def __init__(self):
+        self.version = "1.3"
+        self.name = "Trabajo Practico 1"
+        self.corridas = 0
 
-def program(argv):
-    print colors.Cyan + '~~~~~~~~~~~~~'+name+'~~~~~~~~~~~~~' + colors.NC
-    try:
-        opts, args = getopt.getopt(argv,"ho:c:",["csvfile=","corridas=","report="])
-    except getopt.GetoptError:
-        print 'Argumentos no valido pruebe con\n ColaSimple.py -h'
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
-            print '~~~~~~~~~~~~~~~~~~~~Argumentos~~~~~~~~~~~~~~~~~~~~'
-            print 'Number of arguments:', len(sys.argv), 'arguments.'
-            print 'Argument List:', str(sys.argv)
-            print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'
-            sys.exit()
-        elif opt in ("-c", "--corridas"):
-            corridas = arg
-        elif opt in ("-o", "--cvsfile"):
-            outputfile = str(arg)
-            #print 'guardo en: ', outputfile
+    def load(self,sim):
+        try:
+            sim.TMDeServicio = float(input("Ingrese el tiempo medio de servicio: "))
+            sim.TMEntreArribos = float(input("Ingrese el tiempo medio entre arribos: "))
+        except:
+            print colors.Red + "Ingresaste algo no valido...\n" + colors.Yellow + "en caso de ingresar texto use \"text\"" + colors.NC
+            sys.exit(2)
+
+    def getArg(self,argv):
+        print colors.Cyan + '~~~~~~~~~~~~~'+self.name+' v'+self.version+'~~~~~~~~~~~~~' + colors.NC
+        try:
+            opts, args = getopt.getopt(argv,"ho:c:z")
+        except getopt.GetoptError:
+            print 'Argumentos no valido pruebe con\n'+sys.argv[0]+' -h'
+            sys.exit(2)
+        for opt, arg in opts:
+            if opt == '-h':
+                print '~~~~~~~~~~~~~~~~~~~~~Opciones~~~~~~~~~~~~~~~~~~~~~'
+                print sys.argv[0]+' [opciones]'
+                print '-c -> corridas [-c1]'
+                print '-o -> nombre del archivo csv para el reporte [-o"resporte"]'
+                print '-s -> no muestra valore sintermedios [-s]'
+                print '-p -> bara de progreso en lular de reportes en dada simulacion [-p]'
+                print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'
+                sys.exit()
+            elif opt == '-c':
+                self.corridas = arg
+                print " opt: "+ str(opt) + "arg: "+str(arg)
+            elif opt == '-o':
+                print " opt: "+ str(opt) + "arg: "+str(arg)
+                Reporte.outputfile = str(arg)
+            elif opt == '-z':
+                print '~~~~~~~~~~~~~~~~~~~~Argumentos~~~~~~~~~~~~~~~~~~~~'
+                print 'Number of arguments:', len(sys.argv), 'arguments.'
+                print 'Argument List:', str(sys.argv)
+                print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'
+                sys.exit()
 
 #---------------------------------------------
 # Ejecucion del modelo
 #---------------------------------------------
-# Globales
-name = "Trabajo Practico 1 v1.2"
-corridas = 1
-outputfile = 'reporte'
-
 if __name__ == "__main__":
-    program(sys.argv[1:])
+    program = Programa()
+    program.getArg(sys.argv[1:])
     sim1 = Simulator()
     sim1.inicializar()
-    load(sim1)
+
+    program.load(sim1)
     print colors.Cyan+'~~~~~~~~~~~~~~~~Correr Simulacion~~~~~~~~~~~~~~~~~'+ colors.NC
 
     sim1.run()
