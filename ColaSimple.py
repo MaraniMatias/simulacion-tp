@@ -294,3 +294,5 @@ if __name__ == "__main__":
     print colors.Cyan+'~~~~~~~~~~~~~~~~Correr Simulacion~~~~~~~~~~~~~~~~~'
 
     sim1.run()
+
+#generar 100 observaciones de las variables de respuesta, generando un archivo csv como salida
