@@ -76,21 +76,28 @@ class Simulator(object):
     def toString(self):
         if True:
             print "Valor de la simulacion: "
-            print colors.LightCyan+"Relo\t"+colors.NC+str(self.Reloj)
-            print colors.LightCyan+"EstadoServidor\t"+colors.Yellow+str(self.EstadoServidor)
-            print colors.LightCyan+"ProximoEvento\t"+colors.Yellow+str(self.ProximoEvento)
-            print colors.LightCyan+"ListaDeEventos\t"+colors.NC+str(self.ListaDeEventos)
-            print colors.LightCyan+"Cola\t"+colors.NC+str(self.Cola)
-            print colors.LightCyan+"TSAcumulado\t"+colors.NC+str(self.TSAcumulado)
-            print colors.LightCyan+"DemoraAcumulada\t"+colors.NC+str(self.DemoraAcumulada)
-            print colors.LightCyan+"NroDeClientesEnCola\t"+colors.NC+str(self.NroDeClientesEnCola)
-            print colors.LightCyan+"AreaQDeT\t"+colors.NC+str(self.AreaQDeT)
-            print colors.LightCyan+"TiempoUltimoEvento\t"+colors.NC+str(self.TiempoUltimoEvento)
-            print colors.LightCyan+"CompletaronDemora\t"+colors.NC+str(self.CompletaronDemora)
-            print colors.LightCyan+"Paso\t"+colors.NC+str(self.Paso)
-            print colors.LightCyan+"TMEntreArribos\t"+colors.NC+str(self.TMEntreArribos)
-            print colors.LightCyan+"TMDeServicio\t"+colors.NC+str(self.TMDeServicio)
-            print colors.LightCyan+"Iniciado\t"+colors.BrownOrange+str(self.Iniciado)
+            print colors.LightCyan+"Relo\t"+colors.NC+str(self.Reloj)+colors.NC
+            print colors.LightCyan+"EstadoServidor\t"+colors.Yellow+str(self.EstadoServidor)+colors.NC
+            print colors.LightCyan+"ProximoEvento\t"+colors.Yellow+str(self.ProximoEvento)+colors.NC
+            if len(self.Cola) <= 15:
+                print colors.LightCyan+"ListaDeEventos\t"+colors.Purple+str(np.array(self.ListaDeEventos))+colors.NC
+            else:
+                print colors.LightCyan+"ListaDeEventos de logitud\t"+colors.Red+str(len(self.ListaDeEventos))+colors.NC
+            if len(self.Cola) <= 15:
+                print colors.LightCyan+"Cola\t"+colors.Purple+str(np.array(self.Cola))+colors.NC
+            else:
+                print colors.LightCyan+"Cola de longitud\t"+colors.Red+str(len(self.Cola))+colors.NC
+
+            print colors.LightCyan+"TSAcumulado\t"+colors.NC+str(self.TSAcumulado)+colors.NC
+            print colors.LightCyan+"DemoraAcumulada\t"+colors.NC+str(self.DemoraAcumulada)+colors.NC
+            print colors.LightCyan+"NroDeClientesEnCola\t"+colors.NC+str(self.NroDeClientesEnCola)+colors.NC
+            print colors.LightCyan+"AreaQDeT\t"+colors.NC+str(self.AreaQDeT)+colors.NC
+            print colors.LightCyan+"TiempoUltimoEvento\t"+colors.NC+str(self.TiempoUltimoEvento)+colors.NC
+            print colors.LightCyan+"CompletaronDemora\t"+colors.NC+str(self.CompletaronDemora)+colors.NC
+            print colors.LightCyan+"Paso\t"+colors.NC+str(self.Paso)+colors.NC
+            print colors.LightCyan+"TMEntreArribos\t"+colors.NC+str(self.TMEntreArribos)+colors.NC
+            print colors.LightCyan+"TMDeServicio\t"+colors.NC+str(self.TMDeServicio)+colors.NC
+            print colors.LightCyan+"Iniciado\t"+colors.BrownOrange+str(self.Iniciado)+colors.NC
             print colors.NC+"\n"
 
     # Sub Principal()
