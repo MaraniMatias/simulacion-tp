@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, getopt, time, io
+import sys, getopt, time, io, csv
 import numpy as np
 from collections import deque
 from array import *
@@ -196,26 +196,46 @@ class Simulator(object):
             #print(self.Reloj)
 
     def reportes(self):
+        reporte = Reporte()
+        reporte.Observacion = 0
+        try:
+            reporte.NroPromedioClientesEnCola =  self.AreaQDeT / self.Reloj
+        except ZeroDivisionError:
+            print ZeroDivisionError
+        try:
+            reporte.UtilizacionPromedioServidores =  self.TSAcumulado / self.Reloj
+        except ZeroDivisionError:
+            print ZeroDivisionError
+        try:
+            reporte.DemoraPromedioPorCliente = self.DemoraAcumulada / self.CompletaronDemora
+        except ZeroDivisionError:
+            print ZeroDivisionError
+        reporte.show()
+
+#---------------------------------------------
+# Clase encarda de los reportes
+#---------------------------------------------
+class Reporte(object):
+    def __init__(self):
+        self.Observacion = 0
+        self.NroPromedioClientesEnCola = 0.0
+        self.UtilizacionPromedioServidores = 0.0
+        self.DemoraPromedioPorCliente = 0.0
+        self.NroMaximoDeClientesEnCola = 0.0
+
+    def show(self):
         print colors.LightGreen+'~~~~~~~~~~~~~~~~~~~~~~Reporte~~~~~~~~~~ '+colors.BrownOrange +"Corrida: "+str(0) + colors.NC
-        try:
-            var1 = self.AreaQDeT / self.Reloj
-        except ZeroDivisionError:
-            var1 = 0
-        print colors.Green+'Nro Promedio Clientes En Cola: '+colors.NC+ str(var1)
-        try:
-            var2 = self.TSAcumulado / self.Reloj
-        except ZeroDivisionError:
-            var2 = 0
-        print colors.Green+'Utilizacion Promedio Servidores: ' +colors.NC+ str(var2)
-        try:
-            var3 = self.DemoraAcumulada / self.CompletaronDemora
-        except ZeroDivisionError:
-            var3 = 0
-        print colors.Green+'Demora Promedio Por Cliente: '+colors.NC+ str(var3)
-
+        print colors.Green+'Nro Promedio Clientes En Cola: '+colors.NC+ str(self.NroPromedioClientesEnCola)
+        print colors.Green+'Utilizacion Promedio Servidores: ' +colors.NC+ str(self.UtilizacionPromedioServidores)
+        print colors.Green+'Demora Promedio Por Cliente: '+colors.NC+ str(self.DemoraPromedioPorCliente)
         print colors.Green+'Cantidad Maxima de Clientes en Cola: '+colors.NC+ str(self.NroMaximoDeClientesEnCola)
-
         print colors.LightGreen+'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'+colors.NC
+
+    def toCsv(self):
+        with open('reporte.csv', 'w') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=';', quotechar=';', quoting=csv.QUOTE_MINIMAL)
+            spamwriter.writerow(['Observaciones','Nro Promedio Clientes En Cola', 'Utilizacion Promedio Servidores', 'Demora Promedio Por Cliente','Cantidad Maxima de Clientes en Cola'])
+            spamwriter.writerow([0,])
 
 #---------------------------------------------
 # Funciones Utiluidades
@@ -275,7 +295,7 @@ def program(argv):
         elif opt in ("-c", "--corridas"):
             corridas = arg
         elif opt in ("-o", "--cvsfile"):
-            outputfile = arg
+            outputfile = str(arg)
             #print 'guardo en: ', outputfile
 
 #---------------------------------------------
@@ -284,7 +304,7 @@ def program(argv):
 # Globales
 name = "Trabajo Practico 1 v1.2"
 corridas = 1
-outputfile = ''
+outputfile = 'reporte'
 
 if __name__ == "__main__":
     program(sys.argv[1:])
