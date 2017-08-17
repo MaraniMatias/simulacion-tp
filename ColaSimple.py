@@ -50,7 +50,6 @@ class Simulator(object):
         self.ProximoEvento = ""
         #self.ListaDeEventos = [0,0]  qutar
 
-        #
         # ' Vacio el vector que guardar los tiempos de arribo de los clientes a la cola
         #for i in range(100):
         #    self.Cola[i] = 0
@@ -126,29 +125,22 @@ class Simulator(object):
     def arribos(self):
         # Todo arribo desencadena un nuevo arribo
         self.ListaDeEventos[0] = self.Reloj + self.gen.valorExponencial(self.TMEntreArribos)
-
-        # 'Pregunto si el servidor esta desocupado
+        # Pregunto si el servidor esta desocupado
         if self.EstadoServidor == "D":
-            # ' Cambio el estado del servidor a "Ocupado"
+            # Cambio el estado del servidor a "Ocupado"
             self.EstadoServidor = "O"
-
-            # ' Programo el proximo evento partida
+            # Programo el proximo evento partida
             self.ListaDeEventos[1] = self.Reloj + self.gen.valorExponencial(self.TMDeServicio)
-
-            # ' Acumulo el tiempo de servicio
+            # Acumulo el tiempo de servicio
             self.TSAcumulado += (self.ListaDeEventos[1] - self.Reloj)
-
-            # ' Actualizo la cantidad de clientes que completaron la demora
+            # Actualizo la cantidad de clientes que completaron la demora
             self.CompletaronDemora += 1
-
         else:
             # 'Calculo el area bajo Q(t) desde el momento actual del reloj hacia atras (TiempoUltimoEvento)
             self.AreaQDeT += (self.NroDeClientesEnCola * (self.Reloj - self.TiempoUltimoEvento))
-
-            # ' Incremento la cantidad de clientes en cola en uno (1)
+            # Incremento la cantidad de clientes en cola en uno (1)
             self.NroDeClientesEnCola += 1
-
-            # 'Guardo el valor del reloj en la posicionn "NroDeClientesEnCola" para saber cuando llegar el cliente a la cola y mas adelante calcular la demora.
+            # Guardo el valor del reloj en la posicionn "NroDeClientesEnCola" para saber cuando llegar el cliente a la cola y mas adelante calcular la demora.
             self.Cola.append(self.Reloj) #self.Cola[self.NroDeClientesEnCola] = self.Reloj
 
     def partidas(self):
@@ -156,32 +148,24 @@ class Simulator(object):
         if self.NroDeClientesEnCola > 0:
             # ' Tiempo del proximo evento partida
             self.ListaDeEventos[1] = self.Reloj + self.gen.valorExponencial(self.TMDeServicio)
-
             # 'Acumulo la demora acumulada como el valor actual del reloj menos el valor del reloj cuando el cliente ingresa a la cola
             self.DemoraAcumulada += self.Reloj - self.Cola[0]
-
             # ' Actualizo el contador de clientes que completaron la demora
             self.CompletaronDemora += 1
-
             # ' Acumulo el tiempo de servicio
             self.TSAcumulado += (self.ListaDeEventos[1] - self.Reloj)
-
             # Calculo el Area bajo Q(t) del perriodo anterior (Reloj - TiempoUltimoEvento)
             self.AreaQDeT += (self.NroDeClientesEnCola * (self.Reloj - self.TiempoUltimoEvento))
-
             # Guarda la maxima cantidad de clientes en cola
             if self.NroMaximoDeClientesEnCola < self.NroDeClientesEnCola:
                 self.NroMaximoDeClientesEnCola = self.NroDeClientesEnCola
-
             # Decremento la cantidad de clientes en cola en uno (1)
             self.NroDeClientesEnCola -= 1
-
             # Llamo a la rutina encargada de gestionar la cola, en este caso debera desplazar todos los valores una posicion hacia adelante
             self.Cola.pop(0) #self.quitarDeLaCola()
         else:
             # 'Al no haber clientes en cola, establezco el estado del servidor en "DesOcupado"
             self.EstadoServidor = "D"
-
             # 'Fuerza a que no haya partidas si no hay clientes atendiendo
             self.ListaDeEventos[1] = 99999.0
 
@@ -348,10 +332,14 @@ class Programa(object):
 
     def distribucionType(self,value=0):
         if value == 1:
+            print "Distribucin Exponencial"
+            self.TMEntreArribos = float(input("Ingrese el tiempo medio entre arribos: "))
             return "exponential"
         elif value == 2:
+            print "Distribucin Normal, con parametros μx = 5 y σx = 1,3"
             return "normal"
         elif value == 3:
+            print "Distribucin Uniforme, con parametros a = 3,5 y b = 6,5"
             return "uniforme"
         else:
             print "Ingrese numero para identificar diribucion:\n"+colors.LightGray+"\t1- Exponencial\n\t2- Normal\n\t3- Uniforme\n"+colors.NC
@@ -359,7 +347,6 @@ class Programa(object):
     def read(self):
         try:
             self.TMDeServicio = float(input("Ingrese el tiempo medio de servicio: "))
-            self.TMEntreArribos = float(input("Ingrese el tiempo medio entre arribos: "))
 
             self.distribucionType()
             self.DistribucionVariableTiempoEntreArribos = self.distribucionType(int(input('distribucion para variable tiempo entre arribos: ')))
