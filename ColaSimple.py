@@ -40,6 +40,7 @@ class Simulator(object):
         self.Iniciado = False
 
         self.NroMaximoDeClientesEnCola = 0.0
+        self.gen = Generador()
 
     # Sub Inicializar()
     def inicializar(self):
@@ -62,15 +63,14 @@ class Simulator(object):
         self.CompletaronDemora = 0
 
         # 'Calculo el tiempo de primer arribo
-        self.ListaDeEventos.append(valorExponencial(self.TMEntreArribos))
-        #
+        self.ListaDeEventos.append(self.gen.valorExponencial(self.TMEntreArribos))
+
         # 'Fuerza a que el primer evento no sea una partida
         self.ListaDeEventos.append(999999.0)
         self.Paso = 0
         self.Iniciado = False
         #self.toString()
 
-    #
     # 'Llamo a la rutina de impresion (al solo efecto de ver como evolucionan los valores de las variables)
     # Call imprimo
     def toString(self):
@@ -125,7 +125,7 @@ class Simulator(object):
 
     def arribos(self):
         # Todo arribo desencadena un nuevo arribo
-        self.ListaDeEventos[0] = self.Reloj + valorExponencial(self.TMEntreArribos)
+        self.ListaDeEventos[0] = self.Reloj + self.gen.valorExponencial(self.TMEntreArribos)
 
         # 'Pregunto si el servidor esta desocupado
         if self.EstadoServidor == "D":
@@ -133,7 +133,7 @@ class Simulator(object):
             self.EstadoServidor = "O"
 
             # ' Programo el proximo evento partida
-            self.ListaDeEventos[1] = self.Reloj + valorExponencial(self.TMDeServicio)
+            self.ListaDeEventos[1] = self.Reloj + self.gen.valorExponencial(self.TMDeServicio)
 
             # ' Acumulo el tiempo de servicio
             self.TSAcumulado += (self.ListaDeEventos[1] - self.Reloj)
@@ -155,7 +155,7 @@ class Simulator(object):
         # ' Pregunto si hay clientes en cola
         if self.NroDeClientesEnCola > 0:
             # ' Tiempo del proximo evento partida
-            self.ListaDeEventos[1] = self.Reloj + valorExponencial(self.TMDeServicio)
+            self.ListaDeEventos[1] = self.Reloj + self.gen.valorExponencial(self.TMDeServicio)
 
             # 'Acumulo la demora acumulada como el valor actual del reloj menos el valor del reloj cuando el cliente ingresa a la cola
             self.DemoraAcumulada += self.Reloj - self.Cola[0]
@@ -259,12 +259,6 @@ class Reporte(object):
 #---------------------------------------------
 # Funciones Utiluidades
 #---------------------------------------------
-def valorExponencial(media):
-    try:
-        return np.random.exponential(media)
-    except ValueError:
-        print colors.Red + str(ValueError) + colors.NC
-
 """def quitarDeLaCola(pcola):
     ncola = len(pcola)
     for i in range(ncola):
@@ -295,12 +289,20 @@ class Generador(object):
         self.z0 = int(time.time())
 
     def getNumAleatorio(self):
-        a = math.pow(7,5)
-        m = math.pow(2,31) - 1
+        #a = math.pow(7,5)
+        #m = math.pow(2,31) - 1
+        a = math.pow(5,15)
+        m = math.pow(2,35)
         c = 0
         zi = int( a * self.z0 +c ) %  m
         self.z0 = zi
         return zi/m
+
+    def valorExponencial(self,media):
+        try:
+            return np.random.exponential(media)
+        except ValueError:
+            print colors.Red + str(ValueError) + colors.NC
 
 #---------------------------------------------
 # Progrma, el de consola
@@ -311,7 +313,7 @@ class Programa(object):
     Silencio = False
 
     def __init__(self):
-        self.version = "1.4"
+        self.version = "1.5"
         self.name = "Trabajo Practico 1"
         self.TMDeServicio = 0.0
         self.TMEntreArribos = 0.0
@@ -385,8 +387,6 @@ if __name__ == "__main__":
         sim.inicializar()
         program.load(sim)
         sim.run()
-
-        print str(gen.getNumAleatorio())
 
         if program.progresbar:
             porcent = int(Programa.Observacion) * 100 / int(Programa.Corridas)
