@@ -304,6 +304,30 @@ class Generador(object):
         except ValueError:
             print colors.Red + str(ValueError) + colors.NC
 
+    def valorNormal(self,ex=5,vx=1.3):
+        try:
+            k = 12
+            r = 0
+            for i in xrange(k):
+                r += self.getNumAleatorio()
+            z = r - k/2  #/ math.sqrt(k/12)
+            return vx * z + ex
+        except ValueError:
+            print colors.Red + str(ValueError) + colors.NC
+
+    def valorUniforme(self,a=3.5,b=6.5):
+        try:
+            return a + ( b - a ) + self.getNumAleatorio()
+        except ValueError:
+            print colors.Red + str(ValueError) + colors.NC
+
+    def valor(self,a,b):
+        return self.valorExponencial(a)
+        # tiempo entre arribos
+        return self.valorNormal(a,b)
+        # tiempos de servicio
+        return self.valorUniforme(a,b)
+
 #---------------------------------------------
 # Progrma, el de consola
 #---------------------------------------------
@@ -319,10 +343,28 @@ class Programa(object):
         self.TMEntreArribos = 0.0
         self.progresbar = False
 
+        self.DistribucionVariableTiempoEntreArribos = "exponential"
+        self.DistribucionVariableTiempoServicio = "exponential"
+
+    def distribucionType(self,value=0):
+        if value == 1:
+            return "exponential"
+        elif value == 2:
+            return "normal"
+        elif value == 3:
+            return "uniforme"
+        else:
+            print "Ingrese numero para identificar diribucion:\n"+colors.LightGray+"\t1- Exponencial\n\t2- Normal\n\t3- Uniforme\n"+colors.NC
+
     def read(self):
         try:
             self.TMDeServicio = float(input("Ingrese el tiempo medio de servicio: "))
             self.TMEntreArribos = float(input("Ingrese el tiempo medio entre arribos: "))
+
+            self.distribucionType()
+            self.DistribucionVariableTiempoEntreArribos = self.distribucionType(int(input('distribucion para variable tiempo entre arribos: ')))
+            self.DistribucionVariableTiempoServicio = self.distribucionType(int(input('distribucion variable tiempo de servicio: ')))
+
         except:
             print colors.Red + "Ingresaste algo no valido...\n" + colors.Yellow + "en caso de ingresar texto use \"text\"" + colors.NC
             sys.exit(2)
