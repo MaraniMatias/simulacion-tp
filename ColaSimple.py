@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, getopt, time, io, csv
+import sys, getopt, time, io, csv, math
 import numpy as np
 from collections import deque
 from array import *
@@ -288,6 +288,20 @@ class colors:
     Cyan='\033[0;36m'
     LightCyan='\033[1;36m'
     LightGray='\033[0;37m'
+
+class Generador(object):
+
+    def __init__(self):
+        self.z0 = int(time.time())
+
+    def getNumAleatorio(self):
+        a = math.pow(7,5)
+        m = math.pow(2,31) - 1
+        c = 0
+        zi = int( a * self.z0 +c ) %  m
+        self.z0 = zi
+        return zi/m
+
 #---------------------------------------------
 # Progrma, el de consola
 #---------------------------------------------
@@ -356,6 +370,7 @@ if __name__ == "__main__":
     program.getArg(sys.argv[1:])
     program.read()
     sim = Simulator()
+    gen = Generador()
     print colors.Cyan+'~~~~~~~~~~~~~~~~Correr Simulacion~~~~~~~~~~~~~~~~~'+ colors.NC
 
     if program.progresbar:
@@ -370,6 +385,9 @@ if __name__ == "__main__":
         sim.inicializar()
         program.load(sim)
         sim.run()
+
+        print str(gen.getNumAleatorio())
+
         if program.progresbar:
             porcent = int(Programa.Observacion) * 100 / int(Programa.Corridas)
             bar = porcent * int(toolbar_width) / 100
