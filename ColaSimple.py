@@ -282,17 +282,20 @@ class Generador(object):
         self.z0 = int(time.time())
 
     def getNumAleatorio(self):
-        #a = math.pow(7,5)
-        #m = math.pow(2,31) - 1
-        a = math.pow(5,15)
-        m = math.pow(2,35)
-        c = 0
-        zi = int( a * self.z0 +c ) %  m
-        self.z0 = zi
-        r = zi/m
-        if r < 0 and 1 < r:
-            raise ValueError('Rando mal generado. => ' + str(r))
-        return r
+        try:
+            #a = math.pow(7,5)
+            #m = math.pow(2,31) - 1
+            a = math.pow(5,15)
+            m = math.pow(2,35)
+            c = 0
+            zi = int( a * self.z0 +c ) %  m
+            self.z0 = zi
+            r = zi/m
+            if r < 0 and 1 < r:
+                raise ValueError('Rando mal generado. => ' + str(r))
+            return r
+        except ValueError:
+            print colors.Red + str(ValueError) + colors.NC
 
     def valorExponencial(self,media):
         try:
@@ -302,21 +305,23 @@ class Generador(object):
 
     def valorNormal(self,ex=5,vx=1.3):
         try:
-            k = 12
+            # Ahora para una distribucion no estandar
             r = 0
-            for i in xrange(k):
+            for i in xrange(12):
                 r += self.getNumAleatorio()
-            z = r - k/2  #/ math.sqrt(k/12)
-            #return vx * z + ex
-            return np.random.normal(ex,vx)
+            x = (r - 6) + vx
+            #return np.random.normal(ex,vx)
+            return x
         except ValueError:
             print colors.Red + str(ValueError) + colors.NC
 
     def valorUniforme(self,a=3.5,b=6.5):
         try:
-            #return a + ( b - a ) + self.getNumAleatorio()
-            print a + ( b - a ) * self.getNumAleatorio()
-            return np.random.uniform(a,b)
+            x =  a + ( b - a ) * self.getNumAleatorio()
+            if not ( a < x and x < b):
+                raise ValueError('No es uniforme. => ' + str(x))
+            #return np.random.uniform(a,b)
+            return x
         except ValueError:
             print colors.Red + str(ValueError) + colors.NC
 
