@@ -4,6 +4,7 @@ TP1 - Modificaciones al MM1
 1. por consola enviar parámetros de las variables que definen el comportamiento del sistema y muestre por salida estándar los valores de las 3 variables de respuesta
 2. que calcule la cantidad máxima de clientes en cola como una nueva variable de respuesta y que se muestre por salida estándar
 3. generar 100 observaciones de las variables de respuesta, generando un archivo csv como salida
+
 4. impementar una cola por prioridades en base al menor tiempo estimado
 
 
