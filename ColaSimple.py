@@ -289,7 +289,10 @@ class Generador(object):
         c = 0
         zi = int( a * self.z0 +c ) %  m
         self.z0 = zi
-        return zi/m
+        r = zi/m
+        if r < 0 and 1 < r:
+            raise ValueError('Rando mal generado. => ' + str(r))
+        return r
 
     def valorExponencial(self,media):
         try:
@@ -312,6 +315,7 @@ class Generador(object):
     def valorUniforme(self,a=3.5,b=6.5):
         try:
             #return a + ( b - a ) + self.getNumAleatorio()
+            print a + ( b - a ) * self.getNumAleatorio()
             return np.random.uniform(a,b)
         except ValueError:
             print colors.Red + str(ValueError) + colors.NC
