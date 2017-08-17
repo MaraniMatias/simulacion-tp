@@ -22,6 +22,9 @@ from array import *
 
 class Simulator(object):
 
+    DistribucionVariableTiempoEntreArribos = "exponential"
+    DistribucionVariableTiempoServicio = "exponential"
+
     def __init__(self):
         self.Reloj = 0.0
         self.EstadoServidor = ""
@@ -62,7 +65,7 @@ class Simulator(object):
         self.CompletaronDemora = 0
 
         # 'Calculo el tiempo de primer arribo
-        self.ListaDeEventos.append(self.gen.valorExponencial(self.TMEntreArribos))
+        self.ListaDeEventos.append(self.gen.valor("arribo",self.TMEntreArribos))
 
         # 'Fuerza a que el primer evento no sea una partida
         self.ListaDeEventos.append(999999.0)
@@ -97,6 +100,9 @@ class Simulator(object):
             print colors.LightCyan+"TMEntreArribos\t"+colors.NC+str(self.TMEntreArribos)+colors.NC
             print colors.LightCyan+"TMDeServicio\t"+colors.NC+str(self.TMDeServicio)+colors.NC
             print colors.LightCyan+"Iniciado\t"+colors.BrownOrange+str(self.Iniciado)+colors.NC
+
+            print colors.LightCyan+"Distribucion para la variable tiempo entre arribos: "+colors.NC+Simulator.DistribucionVariableTiempoEntreArribos
+            print colors.LightCyan+"Distribucion para la variable tiempo servicio: "+colors.NC+Simulator.DistribucionVariableTiempoServicio
             print colors.NC+"\n"
 
     # Sub Principal()
@@ -124,13 +130,13 @@ class Simulator(object):
 
     def arribos(self):
         # Todo arribo desencadena un nuevo arribo
-        self.ListaDeEventos[0] = self.Reloj + self.gen.valorExponencial(self.TMEntreArribos)
+        self.ListaDeEventos[0] = self.Reloj + self.gen.valor("arribo",self.TMEntreArribos)
         # Pregunto si el servidor esta desocupado
         if self.EstadoServidor == "D":
             # Cambio el estado del servidor a "Ocupado"
             self.EstadoServidor = "O"
             # Programo el proximo evento partida
-            self.ListaDeEventos[1] = self.Reloj + self.gen.valorExponencial(self.TMDeServicio)
+            self.ListaDeEventos[1] = self.Reloj + self.gen.valor("servicio",self.TMDeServicio)
             # Acumulo el tiempo de servicio
             self.TSAcumulado += (self.ListaDeEventos[1] - self.Reloj)
             # Actualizo la cantidad de clientes que completaron la demora
@@ -147,7 +153,7 @@ class Simulator(object):
         # ' Pregunto si hay clientes en cola
         if self.NroDeClientesEnCola > 0:
             # ' Tiempo del proximo evento partida
-            self.ListaDeEventos[1] = self.Reloj + self.gen.valorExponencial(self.TMDeServicio)
+            self.ListaDeEventos[1] = self.Reloj + self.gen.valor("servicio",self.TMDeServicio)
             # 'Acumulo la demora acumulada como el valor actual del reloj menos el valor del reloj cuando el cliente ingresa a la cola
             self.DemoraAcumulada += self.Reloj - self.Cola[0]
             # ' Actualizo el contador de clientes que completaron la demora
@@ -203,6 +209,7 @@ class Simulator(object):
 # Clase encarda de los reportes
 #---------------------------------------------
 class Reporte(object):
+    outputfile = ""
 
     def __init__(self):
         self.NroPromedioClientesEnCola = 0.0
@@ -220,6 +227,8 @@ class Reporte(object):
             print colors.Yellow+"Variables de entrada:"+colors.NC
             print colors.LightCyan+"Tiempo medio de servicio: "+colors.NC+str(self.TMDeServicio)
             print colors.LightCyan+"Tiempo medio entre arribos: "+colors.NC+str(self.TMEntreArribos)
+            print colors.LightCyan+"Distribucion para la variable tiempo entre arribos: "+colors.NC+Simulator.DistribucionVariableTiempoEntreArribos
+            print colors.LightCyan+"Distribucion para la variable tiempo servicio: "+colors.NC+Simulator.DistribucionVariableTiempoServicio
 
             print colors.Yellow+"Variables de respuesta:"+colors.NC
             print colors.Green+'Nro Promedio Clientes En Cola: '+colors.NC+str(self.NroPromedioClientesEnCola)
@@ -305,12 +314,21 @@ class Generador(object):
         except ValueError:
             print colors.Red + str(ValueError) + colors.NC
 
-    def valor(self,a,b):
-        return self.valorExponencial(a)
-        # tiempo entre arribos
-        return self.valorNormal(a,b)
-        # tiempos de servicio
-        return self.valorUniforme(a,b)
+    def valor(self,serviocioArribos,media):
+        if serviocioArribos == "arribo":
+            if Simulator.DistribucionVariableTiempoEntreArribos == "exponential":
+                return self.valorExponencial(media)
+            if Simulator.DistribucionVariableTiempoEntreArribos == "normal":
+                return self.valorNormal()
+            if Simulator.DistribucionVariableTiempoEntreArribos == "uniforme":
+                return self.valorUniforme()
+        if serviocioArribos == "servicio":
+            if Simulator.DistribucionVariableTiempoServicio == "exponential":
+                return self.valorExponencial(media)
+            if Simulator.DistribucionVariableTiempoServicio == "normal":
+                return self.valorNormal()
+            if Simulator.DistribucionVariableTiempoServicio == "uniforme":
+                return self.valorUniforme()
 
 #---------------------------------------------
 # Progrma, el de consola
@@ -327,30 +345,28 @@ class Programa(object):
         self.TMEntreArribos = 0.0
         self.progresbar = False
 
-        self.DistribucionVariableTiempoEntreArribos = "exponential"
-        self.DistribucionVariableTiempoServicio = "exponential"
-
     def distribucionType(self,value=0):
         if value == 1:
-            print "Distribucin Exponencial"
-            self.TMEntreArribos = float(input("Ingrese el tiempo medio entre arribos: "))
+            print colors.Purple+"Distribucin Exponencial"+colors.NC
             return "exponential"
         elif value == 2:
-            print "Distribucin Normal, con parametros μx = 5 y σx = 1,3"
+            print colors.Purple+"Distribucin Normal, con parametros EX = 5 y VX = 1,3"+colors.NC
             return "normal"
         elif value == 3:
-            print "Distribucin Uniforme, con parametros a = 3,5 y b = 6,5"
+            print colors.Purple+"Distribucin Uniforme, con parametros a = 3,5 y b = 6,5"+colors.NC
             return "uniforme"
         else:
             print "Ingrese numero para identificar diribucion:\n"+colors.LightGray+"\t1- Exponencial\n\t2- Normal\n\t3- Uniforme\n"+colors.NC
 
     def read(self):
         try:
-            self.TMDeServicio = float(input("Ingrese el tiempo medio de servicio: "))
-
             self.distribucionType()
-            self.DistribucionVariableTiempoEntreArribos = self.distribucionType(int(input('distribucion para variable tiempo entre arribos: ')))
-            self.DistribucionVariableTiempoServicio = self.distribucionType(int(input('distribucion variable tiempo de servicio: ')))
+            Simulator.DistribucionVariableTiempoEntreArribos = self.distribucionType(int(input('Distribucion para variable tiempo entre arribos: ')))
+            if Simulator.DistribucionVariableTiempoEntreArribos == "exponential":
+                self.TMEntreArribos = float(input("\tIngrese el tiempo medio entre arribos: "))
+            Simulator.DistribucionVariableTiempoServicio = self.distribucionType(int(input('Distribucion variable tiempo de servicio: ')))
+            if Simulator.DistribucionVariableTiempoServicio == "exponential":
+                self.TMDeServicio = float(input("\tIngrese el tiempo medio de servicio: "))
 
         except:
             print colors.Red + "Ingresaste algo no valido...\n" + colors.Yellow + "en caso de ingresar texto use \"text\"" + colors.NC
