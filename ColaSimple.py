@@ -304,13 +304,15 @@ class Generador(object):
             for i in xrange(k):
                 r += self.getNumAleatorio()
             z = r - k/2  #/ math.sqrt(k/12)
-            return vx * z + ex
+            #return vx * z + ex
+            return np.random.normal(ex,vx)
         except ValueError:
             print colors.Red + str(ValueError) + colors.NC
 
     def valorUniforme(self,a=3.5,b=6.5):
         try:
-            return a + ( b - a ) + self.getNumAleatorio()
+            #return a + ( b - a ) + self.getNumAleatorio()
+            return np.random.uniform(a,b)
         except ValueError:
             print colors.Red + str(ValueError) + colors.NC
 
@@ -395,6 +397,7 @@ class Programa(object):
                 sys.exit()
             elif opt == '-p':
                 self.progresbar = True
+                Programa.Silencio = True
             elif opt == '-s':
                 Programa.Silencio = True
             elif opt == '-c':
