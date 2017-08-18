@@ -2,7 +2,6 @@
 
 import sys, getopt, time, io, csv, math
 import numpy as np
-from collections import deque
 from array import *
 
 """#import datetime
@@ -24,6 +23,7 @@ class Simulator(object):
 
     DistribucionVariableTiempoEntreArribos = "exponential"
     DistribucionVariableTiempoServicio = "exponential"
+    TipoDeDistribucionDeCola = "FIFO"
 
     def __init__(self):
         self.Reloj = 0.0
@@ -53,7 +53,7 @@ class Simulator(object):
         self.ProximoEvento = ""
         #self.ListaDeEventos = [0,0]  qutar
 
-        # ' Vacio el vector que guardar los tiempos de arribo de los clientes a la cola
+        # Vacio el vector que guardar los tiempos de arribo de los clientes a la cola
         #for i in range(100):
         #    self.Cola[i] = 0
 
@@ -64,19 +64,19 @@ class Simulator(object):
         self.TiempoUltimoEvento = 0
         self.CompletaronDemora = 0
 
-        # 'Calculo el tiempo de primer arribo
+        # Calculo el tiempo de primer arribo
         self.ListaDeEventos.append(self.gen.valor("arribo",self.TMEntreArribos))
 
-        # 'Fuerza a que el primer evento no sea una partida
+        # Fuerza a que el primer evento no sea una partida
         self.ListaDeEventos.append(999999.0)
         self.Paso = 0
         self.Iniciado = False
         #self.toString()
 
-    # 'Llamo a la rutina de impresion (al solo efecto de ver como evolucionan los valores de las variables)
+    # Llamo a la rutina de impresion (al solo efecto de ver como evolucionan los valores de las variables)
     # Call imprimo
     def toString(self):
-        if not Programa.Silencio:
+        if not(Programa.Silencio):
             print "Valor de la simulacion: "
             print colors.LightCyan+"Relo\t"+colors.NC+str(self.Reloj)+colors.NC
             print colors.LightCyan+"EstadoServidor\t"+colors.Yellow+str(self.EstadoServidor)+colors.NC
@@ -107,23 +107,17 @@ class Simulator(object):
 
     # Sub Principal()
     def run(self):
-        # 'Llamo a la rutina de inicializacion
+        # Llamo a la rutina de inicializacion
         self.inicializar()
-
-        # Loop Until Reloj >= 8 And NroDeClientesEnCola = 0 And EstadoServidor = "D"
+        # Loop, la simulacion, reloj es el finde la simulacion, en este caso 8 tick
         while not(self.Reloj >= 8 and self.NroDeClientesEnCola == 0 and self.EstadoServidor == "D"):
-            # ' llamada a la rutina de tiempos
-            self.tiempos()
-
-            # ' llamada a la rutina correspondiente en funcion del tipo de evento
-            # Select Case ProximoEvento
+            self.tiempos() # llamada a la rutina de tiempos
+            # llamada a la rutina correspondiente en funcion del tipo de evento, Select ProximoEvento
             if self.ProximoEvento == "ARRIBOS":
                 self.arribos()
             else:
                 self.partidas()
-
-            # ' Llamada a la rutina de imprimo (salo a los fines de ver el estado de las diferentes variables)
-            # Call imprimo
+            # Para ver valores intermedios
             self.toString()
         # Al salir del while es el fin de la simulacion, emitir reporte
         self.reportes()
@@ -142,23 +136,23 @@ class Simulator(object):
             # Actualizo la cantidad de clientes que completaron la demora
             self.CompletaronDemora += 1
         else:
-            # 'Calculo el area bajo Q(t) desde el momento actual del reloj hacia atras (TiempoUltimoEvento)
+            # Calculo el area bajo Q(t) desde el momento actual del reloj hacia atras (TiempoUltimoEvento)
             self.AreaQDeT += (self.NroDeClientesEnCola * (self.Reloj - self.TiempoUltimoEvento))
             # Incremento la cantidad de clientes en cola en uno (1)
             self.NroDeClientesEnCola += 1
             # Guardo el valor del reloj en la posicionn "NroDeClientesEnCola" para saber cuando llegar el cliente a la cola y mas adelante calcular la demora.
-            self.Cola.append(self.Reloj) #self.Cola[self.NroDeClientesEnCola] = self.Reloj
+            self.addClienteEnCola()
 
     def partidas(self):
-        # ' Pregunto si hay clientes en cola
+        # Pregunto si hay clientes en cola
         if self.NroDeClientesEnCola > 0:
-            # ' Tiempo del proximo evento partida
+            # Tiempo del proximo evento partida
             self.ListaDeEventos[1] = self.Reloj + self.gen.valor("servicio",self.TMDeServicio)
-            # 'Acumulo la demora acumulada como el valor actual del reloj menos el valor del reloj cuando el cliente ingresa a la cola
+            # Acumulo la demora acumulada como el valor actual del reloj menos el valor del reloj cuando el cliente ingresa a la cola
             self.DemoraAcumulada += self.Reloj - self.Cola[0]
-            # ' Actualizo el contador de clientes que completaron la demora
+            # Actualizo el contador de clientes que completaron la demora
             self.CompletaronDemora += 1
-            # ' Acumulo el tiempo de servicio
+            # Acumulo el tiempo de servicio
             self.TSAcumulado += (self.ListaDeEventos[1] - self.Reloj)
             # Calculo el Area bajo Q(t) del perriodo anterior (Reloj - TiempoUltimoEvento)
             self.AreaQDeT += (self.NroDeClientesEnCola * (self.Reloj - self.TiempoUltimoEvento))
@@ -170,10 +164,10 @@ class Simulator(object):
             # Llamo a la rutina encargada de gestionar la cola, en este caso debera desplazar todos los valores una posicion hacia adelante
             self.Cola.pop(0) #self.quitarDeLaCola()
         else:
-            # 'Al no haber clientes en cola, establezco el estado del servidor en "DesOcupado"
+            # Al no haber clientes en cola, establezco el estado del servidor en "DesOcupado"
             self.EstadoServidor = "D"
-            # 'Fuerza a que no haya partidas si no hay clientes atendiendo
-            self.ListaDeEventos[1] = 99999.0
+            # Fuerza a que no haya partidas si no hay clientes atendiendo
+            self.ListaDeEventos[1] = 9999999.0
 
     def tiempos(self):
         self.TiempoUltimoEvento = self.Reloj
@@ -183,7 +177,7 @@ class Simulator(object):
         else:
             self.Reloj = self.ListaDeEventos[1]
             self.ProximoEvento = "PARTIDAS"
-            #print(self.Reloj)
+        #print "Reloj: " + str(self.Reloj)
 
     def reportes(self):
         reporte = Reporte()
@@ -204,6 +198,21 @@ class Simulator(object):
             reporte.DemoraPromedioPorCliente = 0.0
         reporte.show()
         reporte.toCsv()
+
+    def addClienteEnCola(self):
+        arribo = self.Reloj
+        if Simulator.TipoDeDistribucionDeCola == 'PRIORIDAD':
+            arribo += self.gen.valor("servicio",self.TMDeServicio) # Calcular cuanto tardara
+            notAdd = True
+            for i in xrange(len(self.Cola)):
+                if arribo < self.Cola[i]:
+                    self.Cola.insert(i,arribo)
+                    notAdd = False
+            if len(self.Cola) == 0 or notAdd:
+                self.Cola.append(arribo)
+        else:
+            self.Cola.append(arribo) #self.Cola[self.NroDeClientesEnCola] = self.Reloj
+        print colors.BrownOrange+"Nuevo arribo: "+str(arribo)+colors.NC
 
 #---------------------------------------------
 # Clase encarda de los reportes
@@ -250,14 +259,8 @@ class Reporte(object):
                 csvfile.write(newRow.encode('utf8'))
 
 #---------------------------------------------
-# Funciones Utiluidades
+# Clases Utiles
 #---------------------------------------------
-"""def quitarDeLaCola(pcola):
-    ncola = len(pcola)
-    for i in range(ncola):
-        pcola[i] = pcola[i + 1]
-    pcola[ncola] = ""
-"""
 class colors:
     NC='\033[0m'
     Black='\033[0;30m'
@@ -325,7 +328,7 @@ class Generador(object):
         except ValueError:
             print colors.Red + str(ValueError) + colors.NC
 
-    def valor(self,serviocioArribos,media):
+    def valor(self,serviocioArribos,media=1):
         if serviocioArribos == "arribo":
             if Simulator.DistribucionVariableTiempoEntreArribos == "exponential":
                 return self.valorExponencial(media)
@@ -350,7 +353,7 @@ class Programa(object):
     Silencio = False
 
     def __init__(self):
-        self.version = "1.5"
+        self.version = "1.7"
         self.name = "Trabajo Practico 1"
         self.TMDeServicio = 0.0
         self.TMEntreArribos = 0.0
@@ -358,24 +361,27 @@ class Programa(object):
 
     def distribucionType(self,value=0):
         if value == 1:
-            print colors.Purple+"Distribucin Exponencial"+colors.NC
+            print colors.Purple+"\tDistribucin Exponencial"+colors.NC
             return "exponential"
         elif value == 2:
-            print colors.Purple+"Distribucin Normal, con parametros EX = 5 y VX = 1,3"+colors.NC
+            print colors.Purple+"\tDistribucin Normal, con parametros EX = 5 y VX = 1,3"+colors.NC
             return "normal"
         elif value == 3:
-            print colors.Purple+"Distribucin Uniforme, con parametros a = 3,5 y b = 6,5"+colors.NC
+            print colors.Purple+"\tDistribucin Uniforme, con parametros a = 3,5 y b = 6,5"+colors.NC
             return "uniforme"
+        elif value == 0:
+            print "Ingrese numero para identificar diribucion:\n"+colors.Yellow+"\t1- Exponencial\n\t2- Normal\n\t3- Uniforme"+colors.NC
         else:
-            print "Ingrese numero para identificar diribucion:\n"+colors.LightGray+"\t1- Exponencial\n\t2- Normal\n\t3- Uniforme\n"+colors.NC
+            return "exponential"
 
     def read(self):
         try:
+            Simulator.TipoDeDistribucionDeCola = 'FIFO' if int(input('-> Tipo de disiplina para la cola'+colors.Yellow+'\n\t 1 - FIFO\n\t 2 - PRIORIDAD\n'+colors.NC+'Eligi un numero: ')) == 1 else 'PRIORIDAD'
             self.distribucionType()
-            Simulator.DistribucionVariableTiempoEntreArribos = self.distribucionType(int(input('Distribucion para variable tiempo entre arribos: ')))
+            Simulator.DistribucionVariableTiempoEntreArribos = self.distribucionType(int(input('-> Distribucion para variable tiempo entre arribos: [1|2|3] ')))
             if Simulator.DistribucionVariableTiempoEntreArribos == "exponential":
                 self.TMEntreArribos = float(input("\tIngrese el tiempo medio entre arribos: "))
-            Simulator.DistribucionVariableTiempoServicio = self.distribucionType(int(input('Distribucion variable tiempo de servicio: ')))
+            Simulator.DistribucionVariableTiempoServicio = self.distribucionType(int(input('-> Distribucion variable tiempo de servicio: [1|2|3] ')))
             if Simulator.DistribucionVariableTiempoServicio == "exponential":
                 self.TMDeServicio = float(input("\tIngrese el tiempo medio de servicio: "))
 
@@ -429,7 +435,6 @@ if __name__ == "__main__":
     program.getArg(sys.argv[1:])
     program.read()
     sim = Simulator()
-    gen = Generador()
     print colors.Cyan+'~~~~~~~~~~~~~~~~Correr Simulacion~~~~~~~~~~~~~~~~~'+ colors.NC
 
     if program.progresbar:
